@@ -21,12 +21,16 @@ This version is relatively more stable:
 - added memory index for quicker calculation
 """
 
-BUFFER_SIZE = int(1e5)        # replay buffer size #int(1e6)
+BUFFER_SIZE = int(2e5)        # replay buffer size #int(1e6)
 BATCH_SIZE = 64               # minibatch size ＃128
-REPLAY_MIN_SIZE = int(1e5)    # min len of memory before replay start int(1e5)
-GAMMA = 0.95                  # discount factor
+REPLAY_MIN_SIZE = int(2e5)    # min len of memory before replay start int(1e5)
+GAMMA = 0.99                  # discount factor
 TAU = 1e-3                    # for soft update of target parameters
 LR = 1e-3                     # learning rate #1e-3
+LR_DECAY = True               # decay learning rate?
+LR_DECAY_START = int(4e5)     # number of steps before decay start
+LR_DECAY_STEP = 1e4           # LR decay steps
+LR_DECAY_GAMMA = 0.01         # LR decay gamma
 UPDATE_EVERY = 4              # how often to update the network #4
 TD_ERROR_EPS = 1e-3           # make sure TD error is not zero
 P_REPLAY_ALPHA = 0.6          # balance between prioritized and random sampling #0.7
@@ -59,6 +63,7 @@ class Agent():
         self.seed = random.seed(seed)
 
         # object reference to constant values:
+        self.lr_decay = LR_DECAY
         self.p_replay_alpha = P_REPLAY_ALPHA
         self.p_replay_beta = P_REPLAY_BETA
         self.reward_scale = REWARD_SCALE
@@ -68,6 +73,9 @@ class Agent():
         self.qnetwork_local = QNetwork(state_size, action_size, seed, USE_DUEL).to(device)
         self.qnetwork_target = QNetwork(state_size, action_size, seed, USE_DUEL).to(device)
         self.optimizer = optim.Adam(self.qnetwork_local.parameters(), lr=LR)
+        self.scheduler = optim.lr_scheduler.StepLR(self.optimizer,
+                                                   LR_DECAY_STEP,
+                                                   gamma=LR_DECAY_GAMMA)
 
         # Replay memory
         self.memory = ReplayBuffer(BUFFER_SIZE, BATCH_SIZE, TD_ERROR_EPS, seed,
@@ -95,35 +103,32 @@ class Agent():
     def get_TD_values(self, local_net, target_net, s, a, r, ns, d, isLearning=False):
 
         ###### TD TARGET #######
-        s, ns = s.float(), ns.float() #to satisfy the network requirement
+        s, ns = s.float().to(device), ns.float().to(device) #to satisfy the network requirement
         with torch.no_grad(): #for sure no grad for this part
 
-            ns_target_vals = target_net(ns.float().to(device))
+            ns_target_vals = target_net(ns)
 
             #0:the value, 1: argmax, unsqueeze to match the side of TD current
             if USE_DOUBLE:
                 if np.random.rand() > 0.5:
                     # use target network to get value
-                    ns_target_vals_tn = target_net(ns.float().to(device))
+                    ns_target_vals_tn = target_net(ns)
                     # use local network to get argmax
-                    ns_target_vals_ln = local_net(ns.float().to(device))
-                    ns_target_max_arg_ln = ns_target_vals_ln.max(dim=1)[1].unsqueeze(dim=-1)
+                    ns_target_max_arg_ln = local_net(ns).max(dim=1)[1].unsqueeze(dim=-1)
 
                     #use local network argmax and target network value
                     ns_target_max_val = torch.gather(ns_target_vals_tn, 1, ns_target_max_arg_ln)
                 else:
                     # use local network to get value
-                    ns_target_vals_ln = local_net(ns.float().to(device))
+                    ns_target_vals_ln = local_net(ns)
                     # use target network to get argmax
-                    ns_target_vals_tn = target_net(ns.float().to(device))
-                    ns_target_max_arg_tn = ns_target_vals_tn.max(dim=1)[1].unsqueeze(dim=-1)
+                    ns_target_max_arg_tn = target_net(ns).max(dim=1)[1].unsqueeze(dim=-1)
 
                     #use target network argmax and local network value
                     ns_target_max_val = torch.gather(ns_target_vals_ln, 1, ns_target_max_arg_tn)
             else:
                 # use target network only for value and argmax
-                ns_target_vals_tn = target_net(ns.float().to(device))
-                ns_target_max_val = ns_target_vals_tn.max(dim=1)[0].unsqueeze(dim=-1)
+                ns_target_max_val = target_net(ns).max(dim=1)[0].unsqueeze(dim=-1)
 
             assert(ns_target_max_val.requires_grad == False)
 
@@ -132,13 +137,13 @@ class Agent():
         ###### TD CURRENT #######
         if isLearning: # if it is under learning mode need backprop
             local_net.train()
-            td_currents_vals = local_net(s.float().to(device))
+            td_currents_vals = local_net(s)
 
             td_currents = torch.gather(td_currents_vals, 1, a.to(device))
         else:
             local_net.eval()
             with torch.no_grad():
-                td_currents_vals = local_net(s.to(device))
+                td_currents_vals = local_net(s)
 
                 td_currents = torch.gather(td_currents_vals, 1, a.to(device))
 
@@ -243,6 +248,9 @@ class Agent():
         squared_err = torch.abs(td_currents - td_targets)**2
         loss = weight * squared_err
         loss = loss.mean()
+
+        if self.lr_decay and self.t_step >= LR_DECAY_START+BUFFER_SIZE:
+            self.scheduler.step() #decay lr
 
         self.optimizer.zero_grad()
         loss.backward()

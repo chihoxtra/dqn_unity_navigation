@@ -33,9 +33,9 @@ class QNetwork(nn.Module):
         ####################################
 
         # duel: output advantage value
-        self.fc3v = nn.Linear(128, 4)
+        self.fc3v = nn.Linear(128, 8)
 
-        self.fc4v = nn.Linear(4, 1)
+        self.fc4v = nn.Linear(8, 1)
 
         ####################################
 
