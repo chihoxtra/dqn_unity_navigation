@@ -26,7 +26,7 @@ BATCH_SIZE = 64               # minibatch size ＃128
 REPLAY_MIN_SIZE = int(2e5)    # min len of memory before replay start int(1e5)
 GAMMA = 0.99                  # discount factor
 TAU = 1e-3                    # for soft update of target parameters
-LR = 1e-3                     # learning rate #1e-3
+LR = 5e-3                     # learning rate #1e-3
 LR_DECAY = True               # decay learning rate?
 LR_DECAY_START = int(4e5)     # number of steps before decay start
 LR_DECAY_STEP = 1e4           # LR decay steps
@@ -249,7 +249,7 @@ class Agent():
         loss = weight * squared_err
         loss = loss.mean()
 
-        if self.lr_decay and self.t_step >= LR_DECAY_START+BUFFER_SIZE:
+        if self.lr_decay and self.t_step >= LR_DECAY_START:
             self.scheduler.step() #decay lr
 
         self.optimizer.zero_grad()
