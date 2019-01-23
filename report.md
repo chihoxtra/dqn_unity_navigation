@@ -43,7 +43,7 @@ After soooooo many different trial and errors, I am glad that I am finally able 
 ![Reward Plot with double network](https://github.com/chihoxtra/dqn_unity_navigation/blob/master/reward_withdoublenetwork1.png)
 <br><br>
 ![Reward Plot without double network](https://github.com/chihoxtra/dqn_unity_navigation/blob/master/reward_plot.png)
-<P>
+<br><br>
 Here is a video of the trained agent:<br>
 ![Trained Model](https://github.com/chihoxtra/dqn_unity_navigation/blob/master/youtube.png)<br>
 [Video Link](https://www.youtube.com/watch?v=63gxOq67coM&feature=youtu.be)
