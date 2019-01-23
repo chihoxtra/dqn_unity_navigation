@@ -28,14 +28,14 @@ GAMMA = 0.99                  # discount factor
 TAU = 1e-3                    # for soft update of target parameters
 LR = 1e-4                     # learning rate #1e-3
 LR_DECAY = True               # decay learning rate?
-LR_DECAY_START = int(5e5)     # number of steps before decay start
+LR_DECAY_START = int(3.5e5)   # number of steps before lr decay starts
 LR_DECAY_STEP = int(5e3)      # LR decay steps
 LR_DECAY_GAMMA = 0.999        # LR decay gamma
 UPDATE_EVERY = 16             # how often to update the network #4
 TD_ERROR_EPS = 1e-3           # make sure TD error is not zero
 P_REPLAY_ALPHA = 0.6          # balance between prioritized and random sampling #0.7
 P_REPLAY_BETA = 0.4           # adjustment on weight update #0.5
-P_BETA_DELTA = 1e-6           # beta increment per sampling
+P_BETA_DELTA = 1e-4           # beta increment per sampling
 USE_DUEL = False              # use duel network? V and A?
 USE_DOUBLE = False            # use double network to select TD value?
 REWARD_SCALE = False          # use reward clipping?
@@ -105,7 +105,7 @@ class Agent():
     def get_TD_values(self, local_net, target_net, s, a, r, ns, d, isLearning=False):
 
         ###### TD TARGET #######
-        s, ns = s.float().to(device), ns.float().to(device) #to satisfy the network requirement
+        s, ns, a = s.float().to(device), ns.float().to(device), a.to(device)
         with torch.no_grad(): #for sure no grad for this part
 
             ns_target_vals = target_net(ns)
@@ -141,13 +141,13 @@ class Agent():
             local_net.train()
             td_currents_vals = local_net(s)
 
-            td_currents = torch.gather(td_currents_vals, 1, a.to(device))
+            td_currents = torch.gather(td_currents_vals, 1, a)
         else:
             local_net.eval()
             with torch.no_grad():
                 td_currents_vals = local_net(s)
 
-                td_currents = torch.gather(td_currents_vals, 1, a.to(device))
+                td_currents = torch.gather(td_currents_vals, 1, a)
 
         local_net.train() #resume training for local network
 

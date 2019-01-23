@@ -13,7 +13,17 @@ This project attempts to use a DQN as a function appropximator to enable an agen
 
 A reward of +1 is provided for collecting a yellow banana, and a reward of -1 is provided for collecting a blue banana. Thus, the goal of your agent is to collect as many yellow bananas as possible while avoiding blue bananas.
 <P>
-The state space has 37 dimensions and contains the agent's velocity, along with ray-based perception of objects around the agent's forward direction. Given this information, the agent has to learn how to best select actions. Four discrete actions are available, corresponding to:
+The state space has 37 dimensions and contains the agent's velocity, along with ray-based perception of objects around the agent's forward direction. <P>
+According to [Unity Github](https://github.com/Unity-Technologies/ml-agents/issues/1134), states can be interpreted as follows:
+- Vector - 37 values
+  - Values 1-36 - ray values
+  - Value 37 - agent linear velocity
+Ray Values<br>
+- 6 vectors of length 6
+  - Values 1-5 - (1 or 0) - ray segments in increasing distance from the agent presence of a banana
+  - Value 6 - Angular rotation of the ray from it starting point
+<P>
+Given this information, the agent has to learn how to best select actions. Four discrete actions are available, corresponding to:
 * 0 - move forward.
 * 1 - move backward.
 * 2 - turn left.
@@ -54,3 +64,20 @@ python -m ipykernel install --user --name drlnd --display-name "drlnd"
 ```
 
 5. Before running code in a notebook, change the kernel to match the `drlnd` environment by using the drop-down `Kernel` menu.
+
+6. Make sure you have the right Unity env to run this notebook. If you do not wish to install the whole unity environment, you can choose to download the 'self-contained' environments thru the following links:
+- [Linux](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P1/Banana/Banana_Linux.zip)
+- [Mac](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P1/Banana/Banana.app.zip)
+- [AWS Linus](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P1/Banana/Banana_Linux_NoVis.zip): this is a headless version and please remember to [turn on Xorg](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Training-on-Amazon-Web-Service.md) as the env needs to output to a display channel to run. Note that the codes should be fully compatable with GPU enabled environment. You might however need to enable GPU by installing GPU drivers in AWS.
+
+7. To run the notebook, make sure you are in the environment 'drlnd'. You can activate your environment like this:
+```bash
+source activate drlnd
+```
+then you can start the notebook on your local machine.
+```bash
+jupyter notebook --ip=0.0.0.0 --no-browser
+```
+To run the notebook, press shift-enter and it shall run the codes cell by cell.
+<P>
+Any question? please feel free to contact me at: [samuelpun@gmail.com](mailto:samuelpun@gmail.com)
