@@ -33,10 +33,10 @@ PER alpha = 0.6
 PER beta  |  0.4     
 
 #### The Result:
-After soooooo many different trial and errors, I am glad that I am finally able to reach an average score of 13 within training episodes.    
+After soooooo many different trial and errors, I am glad that I am finally able to reach an average score of 13 within training episodes. <P>
 ![Reward Plot](https://github.com/chihoxtra/dqn_unity_navigation/blob/master/reward_plot.png)
-<br>
-Here is a video of the trained agent:
+<P>
+Here is a video of the trained agent:<br>
 ![Trained Model](https://github.com/chihoxtra/dqn_unity_navigation/blob/master/youtube.png)<br>
 [Video Link](https://youtu.be/VrMcb4NZDOQ)
 
