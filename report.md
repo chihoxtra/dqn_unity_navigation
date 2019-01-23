@@ -25,18 +25,18 @@ PER was implemented in this project and it took me so much time to do it. There 
 - PER was found to be able to accelerate the learning.
 <p>
 Here are a summary of the hyper parameters used:
-Parameters | Value
------------- | -------------
-Memory buffer size  | 1e5        
-batch size  |  64
-REPLAY_MIN_SIZE  |  int(1e5)   
-Gamme  | 0.99                  
-Tau  | 1e-3                    
-Learning Rate  |  1e-4  
-update target network frequency  | 16    
-minimal TD error  |  1e-3         
-PER alpha |  0.6          
-PER beta  |  0.4     
+<table>
+
+<table width=600>
+<tr><td>Memory buffer size  </td><td> 1e5    </td></tr>     
+<tr><td>REPLAY_MIN_SIZE  </td><td>  int(1e5)   </td></tr>
+<tr><td>Gamme  </td><td> 0.99    </td></tr>               
+<tr><td>Tau  </td><td> 1e-3          </td></tr>           
+<tr><td>Learning Rate  </td><td>  1e-4  </td></tr>
+<tr><td>update target network frequency  </td><td> 16    </td></tr>
+<tr><td>minimal TD error  </td><td> 1e-3    </td></tr>      
+<tr><td>PER beta  </td><td>  0.4    </td></tr>
+</table>
 
 #### The Result:
 After soooooo many different trial and errors, I am glad that I am finally able to reach an average score of 13 within 653 training episodes. <P>
