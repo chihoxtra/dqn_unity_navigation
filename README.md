@@ -57,6 +57,21 @@ git clone https://github.com/udacity/deep-reinforcement-learning.git
 cd deep-reinforcement-learning/python
 pip install .
 ```
+And here is the list of packages requirements:
+- tensorflow==1.7.1
+- Pillow>=4.2.1
+- matplotlib
+- numpy>=1.11.0
+- jupyter
+- pytest>=3.2.2
+- docopt
+- pyyaml
+- protobuf==3.5.2
+- grpcio==1.11.0
+- torch==0.4.0
+- pandas
+- scipy
+- ipykernel
 
 4. Create an [IPython kernel](http://ipython.readthedocs.io/en/stable/install/kernel_install.html) for the `drlnd` environment.  
 ```bash
