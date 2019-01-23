@@ -19,25 +19,26 @@ This version is relatively more stable:
 - added error clipping
 - used deque rotation instead of indexing for quicker update
 - added memory index for quicker calculation
+- added treeSum
 """
 
-BUFFER_SIZE = int(1e3)        # replay buffer size #int(1e6)
+BUFFER_SIZE = int(1e5)        # replay buffer size #int(1e6)
 BATCH_SIZE = 64               # minibatch size ＃128
-REPLAY_MIN_SIZE = int(1e3)    # min len of memory before replay start int(1e5)
+REPLAY_MIN_SIZE = int(1e5)    # min len of memory before replay start int(1e5)
 GAMMA = 0.99                  # discount factor
 TAU = 1e-3                    # for soft update of target parameters
 LR = 1e-4                     # learning rate #1e-3
 LR_DECAY = True               # decay learning rate?
-LR_DECAY_START = int(4e5)     # number of steps before lr decay starts
+LR_DECAY_START = int(3.5e5)   # number of steps before lr decay starts
 LR_DECAY_STEP = int(5e3)      # LR decay steps
 LR_DECAY_GAMMA = 0.999        # LR decay gamma
 UPDATE_EVERY = 16             # how often to update the network #4
 TD_ERROR_EPS = 1e-3           # make sure TD error is not zero
 P_REPLAY_ALPHA = 0.6          # balance between prioritized and random sampling #0.7
 P_REPLAY_BETA = 0.4           # adjustment on weight update #0.5
-P_BETA_DELTA = 1e-6           # beta increment per sampling
+P_BETA_DELTA = 1e-4           # beta increment per sampling
 USE_DUEL = False              # use duel network? V and A?
-USE_DOUBLE = False            # use double network to select TD value?
+USE_DOUBLE = True             # use double network to select TD value?
 REWARD_SCALE = False          # use reward clipping?
 ERROR_CLIP = False            # clip error
 ERROR_MAX = 1.0               # max value of error if do clipping
@@ -86,6 +87,10 @@ class Agent():
         self.t_step = 0
         # keep track on whether training has started
         self.isTraining = False
+
+        # avoid idle actions
+        self.linVelHistory = deque(maxlen=20)
+
         self.print_params()
 
     def print_params(self):
@@ -129,7 +134,6 @@ class Agent():
                     #use target network argmax and local network value
                     ns_target_max_val = torch.gather(ns_target_vals_ln, 1, ns_target_max_arg_tn)
             else:
-                print(a.shape)
                 # use target network only for value and argmax
                 ns_target_max_val = target_net(ns).max(dim=1)[0].unsqueeze(dim=-1)
 
@@ -183,6 +187,9 @@ class Agent():
         # Learn every UPDATE_EVERY time steps.
         self.t_step += 1
 
+        # keep lin vel history:
+        self.linVelHistory.append(state[36])
+
         # gradually increase beta to 1 until end of epoche
         if self.isTraining:
             self.p_replay_beta = min(1.0, self.p_replay_beta + 0.001)
@@ -223,8 +230,12 @@ class Agent():
             action_values = self.qnetwork_local(state)
         self.qnetwork_local.train()
 
+        # check linear velocity history
+        if len(self.linVelHistory) >= 20:
+            linVelStd = np.std(self.linVelHistory)
+
         # Epsilon-greedy action selection
-        if random.random() > eps:
+        if random.random() > eps and linVelStd!= 0:
             action =  np.argmax(action_values.cpu().data.numpy())
         else:
             action = random.choice(np.arange(self.action_size))
