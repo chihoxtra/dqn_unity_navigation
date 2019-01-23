@@ -39,12 +39,14 @@ PER alpha = 0.6
 PER beta  |  0.4     
 
 #### The Result:
-After soooooo many different trial and errors, I am glad that I am finally able to reach an average score of 13 within training episodes. <P>
-![Reward Plot](https://github.com/chihoxtra/dqn_unity_navigation/blob/master/reward_plot.png)
+After soooooo many different trial and errors, I am glad that I am finally able to reach an average score of 13 within 653 training episodes. <P>
+![Reward Plot with double network](https://github.com/chihoxtra/dqn_unity_navigation/blob/master/reward_withdoublenetwork1.png)
+<P>
+![Reward Plot without double network](https://github.com/chihoxtra/dqn_unity_navigation/blob/master/reward_plot.png)
 <P>
 Here is a video of the trained agent:<br>
 ![Trained Model](https://github.com/chihoxtra/dqn_unity_navigation/blob/master/youtube.png)<br>
-[Video Link](https://youtu.be/VrMcb4NZDOQ)
+[Video Link](https://www.youtube.com/watch?v=63gxOq67coM&feature=youtu.be)
 
 #### Other attempts:
 - *Dual Network* an attempt to use duel network is also made. However, unlike the case in Atari game play agent (by google deepmind) where the convolutional part of the network is shared, the base network used here is very shallow and I find that if only a small portion of the network is shared, the performance might be worse compared to the Atari case. Therefore even after the implementation, it is not used at the end.
