@@ -10,11 +10,30 @@ Instead of using other techniques like discretization of continuous states, this
 PER was implemented in this project and it took me so much time to do it. There are a couple of components of PER being implemented here:
 - A Binary Tree architecture that used a one-dimensional array to store the td errors values. This data structure allows very easy and quick access to values and to do sorting. The implementation does NOT have any recursion as, after some testing, it is found that even a memory size of 1e4 could cause recursion number to exceed python's max limit. This structure is very efficient compared to deque. I also implemented deque here so they can be compared.
 - There are 3 parameters used in PER.
+![PER formula](https://github.com/chihoxtra/dqn_unity_navigation/blob/master/per_formula.png)
   - Alpha: the power value applied when calculating the probability. Value used here is 0.6 as I personally find that this works the best.
   - Beta: 0.5 and it grows linearly to 1 as mentioned in the paper.
   - eps: This is added to all powered td values to make sure that they are not zero. I personally find that it cannot be too small cause otherwise some experience would never be chosen. Here I used 1e-3.
 - Weight adjustment was very tricky. The calculation could be different if we take the mean first before multiplying by the squared difference between td target and td current.
+- To facilitate training, the memory is 'pre-fetched' with experience before the training started. This could make the training smoother as different experience scenarios are available at earlier stage and it seems that it is always better for agent to encounter these special cases earlier instead of later when the network is already taking shape.
 - PER was found to be able to accelerate the learning.
+<p>
+Here are a summary of the hyper parameters used:
+Parameters | Value
+------------ | -------------
+Memory buffer size  | 1e5        
+batch size  |  64
+REPLAY_MIN_SIZE  |  int(1e5)   
+Gamme  | 0.99                  
+Tau  | 1e-3                    
+Learning Rate = 1e-4  
+update target network frequency  | 16    
+minimal TD error  |  1e-3         
+PER alpha = 0.6          
+PER beta  |  0.4     
+
+#### The Result:
+After soooooo many different trial and errors, I am glad that I am finally able to reach an average score of 13 within training episodes.     
 
 #### Other attempts:
 - *Dual Network* an attempt to use duel network is also made. However, unlike the case in Atari game play agent (by google deepmind) where the convolutional part of the network is shared, the base network used here is very shallow and I find that if only a small portion of the network is shared, the performance might be worse compared to the Atari case. Therefore even after the implementation, it is not used at the end.
