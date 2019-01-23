@@ -32,10 +32,10 @@ batch size  |  64
 REPLAY_MIN_SIZE  |  int(1e5)   
 Gamme  | 0.99                  
 Tau  | 1e-3                    
-Learning Rate = 1e-4  
+Learning Rate  |  1e-4  
 update target network frequency  | 16    
 minimal TD error  |  1e-3         
-PER alpha = 0.6          
+PER alpha |  0.6          
 PER beta  |  0.4     
 
 #### The Result:
