@@ -8,7 +8,7 @@ Unity Network
 
 class QNetwork(nn.Module):
 
-    def __init__(self, state_size, action_size, seed, duel=False):
+    def __init__(self, state_size, action_size, seed=0, duel=False):
         """Initialize parameters and build model.
         Params
         ======
@@ -41,7 +41,7 @@ class QNetwork(nn.Module):
 
         self.fc3 = nn.Linear(64, action_size)
 
-    def forward(self, state_inputs):
+    def forward(self, state_inputs, actions=None):
         """Build a network that maps state -> action values."""
 
         # common: one linear relu layer
