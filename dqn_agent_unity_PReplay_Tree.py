@@ -21,21 +21,21 @@ This version is relatively more stable:
 - added memory index for quicker calculation
 """
 
-BUFFER_SIZE = int(2e5)        # replay buffer size #int(1e6)
+BUFFER_SIZE = int(1e5)        # replay buffer size #int(1e6)
 BATCH_SIZE = 64               # minibatch size ＃128
-REPLAY_MIN_SIZE = int(2e5)    # min len of memory before replay start int(1e5)
+REPLAY_MIN_SIZE = int(1e5)    # min len of memory before replay start int(1e5)
 GAMMA = 0.99                  # discount factor
 TAU = 1e-3                    # for soft update of target parameters
-LR = 5e-3                     # learning rate #1e-3
+LR = 1e-4                     # learning rate #1e-3
 LR_DECAY = True               # decay learning rate?
-LR_DECAY_START = int(4e5)     # number of steps before decay start
-LR_DECAY_STEP = 1e4           # LR decay steps
-LR_DECAY_GAMMA = 0.01         # LR decay gamma
-UPDATE_EVERY = 4              # how often to update the network #4
+LR_DECAY_START = int(5e5)     # number of steps before decay start
+LR_DECAY_STEP = int(5e3)      # LR decay steps
+LR_DECAY_GAMMA = 0.999        # LR decay gamma
+UPDATE_EVERY = 16             # how often to update the network #4
 TD_ERROR_EPS = 1e-3           # make sure TD error is not zero
 P_REPLAY_ALPHA = 0.6          # balance between prioritized and random sampling #0.7
 P_REPLAY_BETA = 0.4           # adjustment on weight update #0.5
-#LEARNING_LOOP = 1            # no of learning cycle before the next episode
+P_BETA_DELTA = 1e-6           # beta increment per sampling
 USE_DUEL = False              # use duel network? V and A?
 USE_DOUBLE = False            # use double network to select TD value?
 REWARD_SCALE = False          # use reward clipping?
@@ -82,12 +82,13 @@ class Agent():
                                    P_REPLAY_ALPHA, REWARD_SCALE, ERROR_CLIP,
                                    ERROR_MAX, ERROR_INIT, USE_TREE)
 
-        # keep track on whether training has started
-        self.isTraining = False
-
         # Initialize time step (for updating every UPDATE_EVERY steps and others)
         self.t_step = 0
+        # keep track on whether training has started
+        self.isTraining = False
+        self.print_params()
 
+    def print_params(self):
         print("current device: {}".format(device))
         print("use duel network (a and v): {}".format(USE_DUEL))
         print("use double network: {}".format(USE_DOUBLE))
@@ -95,7 +96,8 @@ class Agent():
         print("use error clipping: {}".format(ERROR_CLIP))
         print("buffer size: {}".format(BUFFER_SIZE))
         print("batch size: {}".format(BATCH_SIZE))
-        print("learning rate: {}".format(LR))
+        print("initial learning rate: {}".format(LR))
+        print("learing rate decay: {}".format(LR_DECAY))
         print("min replay size: {}".format(REPLAY_MIN_SIZE))
         print("target network update: {}".format(UPDATE_EVERY))
         print("optimizer: {}".format(self.optimizer))
@@ -182,13 +184,15 @@ class Agent():
 
         # gradually increase beta to 1 until end of epoche
         if self.isTraining:
-            self.p_replay_beta = P_REPLAY_BETA+((1-P_REPLAY_BETA)/ep_prgs[1])*ep_prgs[0]
+            self.p_replay_beta = min(1.0, self.p_replay_beta + 0.001)
+            #self.p_replay_beta = P_REPLAY_BETA+((1-P_REPLAY_BETA)/ep_prgs[1])*ep_prgs[0]
 
         # If enough samples are available in memory, get random subset and learn
-        if self.t_step >= REPLAY_MIN_SIZE-1:
+        if self.t_step >= REPLAY_MIN_SIZE:
             # training starts!
             if self.isTraining == False:
-                print("training starts!                            \r")
+                self.print_params()
+                print("Prefetch completed. Training starts!                         \r")
                 self.isTraining = True
 
             #for i in range(LEARNING_LOOP): #greedy learning loop

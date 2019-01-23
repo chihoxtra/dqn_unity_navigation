@@ -23,23 +23,23 @@ class QNetwork(nn.Module):
 
         self.fc1 = nn.Linear(state_size, 128)
 
-        self.fc2 = nn.Linear(128, 128) #-> common_out
+        self.fc2 = nn.Linear(128, 64) #-> common_out
 
         # duel: output action values
-        self.fc3a = nn.Linear(128, 8)
+        self.fc3a = nn.Linear(64, 8)
 
         self.fc4a = nn.Linear(8, action_size)
 
         ####################################
 
         # duel: output advantage value
-        self.fc3v = nn.Linear(128, 8)
+        self.fc3v = nn.Linear(64, 8)
 
         self.fc4v = nn.Linear(8, 1)
 
         ####################################
 
-        self.fc3 = nn.Linear(128, action_size)
+        self.fc3 = nn.Linear(64, action_size)
 
     def forward(self, state_inputs):
         """Build a network that maps state -> action values."""
