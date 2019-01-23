@@ -37,7 +37,7 @@ After soooooo many different trial and errors, I am glad that I am finally able 
 ![Reward Plot](https://github.com/chihoxtra/dqn_unity_navigation/blob/master/reward_plot.png)
 <br>
 Here is a video of the trained agent:
-![Trained Model](https://github.com/chihoxtra/dqn_unity_navigation/blob/master/youtube.png)
+![Trained Model](https://github.com/chihoxtra/dqn_unity_navigation/blob/master/youtube.png)<br>
 [Video Link](https://youtu.be/VrMcb4NZDOQ)
 
 #### Other attempts:
