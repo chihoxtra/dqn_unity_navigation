@@ -19,6 +19,7 @@ This version is relatively more stable:
 - added error clipping
 - used deque rotation instead of indexing for quicker update
 - added memory index for quicker calculation
+- added treeSum
 """
 
 BUFFER_SIZE = int(1e5)        # replay buffer size #int(1e6)
@@ -37,7 +38,7 @@ P_REPLAY_ALPHA = 0.6          # balance between prioritized and random sampling 
 P_REPLAY_BETA = 0.4           # adjustment on weight update #0.5
 P_BETA_DELTA = 1e-4           # beta increment per sampling
 USE_DUEL = False              # use duel network? V and A?
-USE_DOUBLE = False            # use double network to select TD value?
+USE_DOUBLE = True             # use double network to select TD value?
 REWARD_SCALE = False          # use reward clipping?
 ERROR_CLIP = False            # clip error
 ERROR_MAX = 1.0               # max value of error if do clipping
@@ -86,6 +87,10 @@ class Agent():
         self.t_step = 0
         # keep track on whether training has started
         self.isTraining = False
+
+        # avoid idle actions
+        self.linVelHistory = deque(maxlen=20)
+
         self.print_params()
 
     def print_params(self):
@@ -182,6 +187,9 @@ class Agent():
         # Learn every UPDATE_EVERY time steps.
         self.t_step += 1
 
+        # keep lin vel history:
+        self.linVelHistory.append(state[36])
+
         # gradually increase beta to 1 until end of epoche
         if self.isTraining:
             self.p_replay_beta = min(1.0, self.p_replay_beta + 0.001)
@@ -222,8 +230,12 @@ class Agent():
             action_values = self.qnetwork_local(state)
         self.qnetwork_local.train()
 
+        # check linear velocity history
+        if len(self.linVelHistory) >= 20:
+            linVelStd = np.std(self.linVelHistory)
+
         # Epsilon-greedy action selection
-        if random.random() > eps:
+        if random.random() > eps and linVelStd!= 0:
             action =  np.argmax(action_values.cpu().data.numpy())
         else:
             action = random.choice(np.arange(self.action_size))

@@ -8,7 +8,7 @@ Instead of using other techniques like discretization of continuous states, this
 
 #### Double Network
 After a few attempts, it is found that double network have the following benefits:
-- accelerate the learning (in my experience, i can achieve 13 reward faster than a network without double network)
+- accelerate the learning. In my experience, i can achieve 13 reward faster (653 episodes) than a network without double network (1009 episodes).
 - make the td values magnitude smaller
 Here 50% of chance the target network will choose the action and local network will calculate the Q value. Another 50% of chance their role will swap. I personally find it working well for this task.
 
