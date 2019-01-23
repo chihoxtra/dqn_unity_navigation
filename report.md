@@ -40,8 +40,10 @@ Here are a summary of the hyper parameters used:
 
 #### The Result:
 After soooooo many different trial and errors, I am glad that I am finally able to reach an average score of 13 within 653 training episodes. <P>
+Reward Plot with double network<br>
 ![Reward Plot with double network](https://github.com/chihoxtra/dqn_unity_navigation/blob/master/reward_withdoublenetwork1.png)
 <br><br>
+Reward Plot without double network<br>
 ![Reward Plot without double network](https://github.com/chihoxtra/dqn_unity_navigation/blob/master/reward_plot.png)
 <br><br>
 Here is a video of the trained agent:<br>
