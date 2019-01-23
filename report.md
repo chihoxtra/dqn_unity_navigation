@@ -37,7 +37,8 @@ After soooooo many different trial and errors, I am glad that I am finally able 
 ![Reward Plot](https://github.com/chihoxtra/dqn_unity_navigation/blob/master/reward_plot.png)
 <br>
 Here is a video of the trained agent:
-<iframe width="560" height="315" src="https://www.youtube.com/embed/VrMcb4NZDOQ" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+![Trained Model](https://github.com/chihoxtra/dqn_unity_navigation/blob/master/youtube.png)
+[Video Link](https://youtu.be/VrMcb4NZDOQ)
 
 #### Other attempts:
 - *Dual Network* an attempt to use duel network is also made. However, unlike the case in Atari game play agent (by google deepmind) where the convolutional part of the network is shared, the base network used here is very shallow and I find that if only a small portion of the network is shared, the performance might be worse compared to the Atari case. Therefore even after the implementation, it is not used at the end.
