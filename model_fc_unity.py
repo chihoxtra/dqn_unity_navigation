@@ -23,23 +23,25 @@ class QNetwork(nn.Module):
 
         self.fc1 = nn.Linear(state_size, 128)
 
-        self.fc2 = nn.Linear(128, 64) #-> common_out
+        #self.fc2 = nn.Linear(128, 128)
+
+        self.fc3 = nn.Linear(128, 64) #-> common_out
 
         # duel: output action values
-        self.fc3a = nn.Linear(64, 8)
+        self.fc4a = nn.Linear(64, 8)
 
-        self.fc4a = nn.Linear(8, action_size)
+        self.fc5a = nn.Linear(8, action_size)
 
         ####################################
 
         # duel: output advantage value
-        self.fc3v = nn.Linear(64, 8)
+        self.fc4v = nn.Linear(64, 8)
 
-        self.fc4v = nn.Linear(8, 1)
+        self.fc5v = nn.Linear(8, 1)
 
         ####################################
 
-        self.fc3 = nn.Linear(64, action_size)
+        self.fc6 = nn.Linear(64, action_size)
 
     def forward(self, state_inputs, actions=None):
         """Build a network that maps state -> action values."""
@@ -47,18 +49,21 @@ class QNetwork(nn.Module):
         # common: one linear relu layer
         x = F.relu(self.fc1(state_inputs))
 
+        # common: one linear relu layer
+        #x = F.relu(self.fc2(x))
+
         # common: one linear relu layer for action
-        common_out = F.relu(self.fc2(x))
+        common_out = F.relu(self.fc3(x))
 
         # if duel network is applied
         if self.duel:
             # for actions
-            a = F.relu(self.fc3a(common_out))
-            a = self.fc4a(a)
+            a = F.relu(self.fc4a(common_out))
+            a = self.fc5a(a)
 
             # for values
-            v = F.relu(self.fc3v(common_out))
-            v = self.fc4v(v)
+            v = F.relu(self.fc4v(common_out))
+            v = self.fc5v(v)
 
             #A(sa') - 1/|A|*A(sa')p
             a_adj = a - a.mean(dim=1, keepdim=True)
@@ -66,7 +71,7 @@ class QNetwork(nn.Module):
             out = v + a_adj
         else:
             # one linear output layer for actions
-            out = self.fc3(common_out)
+            out = self.fc6(common_out)
 
         # final output
         return out

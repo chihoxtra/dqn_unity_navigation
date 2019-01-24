@@ -19,7 +19,6 @@ This version is relatively more stable:
 - added error clipping
 - used deque rotation instead of indexing for quicker update
 - added memory index for quicker calculation
-- added treeSum
 """
 
 BUFFER_SIZE = int(1e5)        # replay buffer size #int(1e6)
@@ -29,22 +28,21 @@ GAMMA = 0.99                  # discount factor
 TAU = 1e-3                    # for soft update of target parameters
 LR = 1e-4                     # learning rate #1e-3
 LR_DECAY = True               # decay learning rate?
-LR_DECAY_START = int(3.5e5)   # number of steps before lr decay starts
+LR_DECAY_START = int(5e5)     # number of steps before decay start
 LR_DECAY_STEP = int(5e3)      # LR decay steps
 LR_DECAY_GAMMA = 0.999        # LR decay gamma
 UPDATE_EVERY = 16             # how often to update the network #4
 TD_ERROR_EPS = 1e-3           # make sure TD error is not zero
 P_REPLAY_ALPHA = 0.6          # balance between prioritized and random sampling #0.7
 P_REPLAY_BETA = 0.4           # adjustment on weight update #0.5
-P_BETA_DELTA = 1.5e-6         # beta increment per sampling
-USE_DUEL = True               # use duel network? V and A?
-USE_DOUBLE = True             # use double network to select TD value?
+P_BETA_DELTA = 1e-6           # beta increment per sampling
+USE_DUEL = False              # use duel network? V and A?
+USE_DOUBLE = False            # use double network to select TD value?
 REWARD_SCALE = False          # use reward clipping?
-ERROR_CLIP = True             # clip error
+ERROR_CLIP = False            # clip error
 ERROR_MAX = 1.0               # max value of error if do clipping
-ERROR_INIT = True             # set an init value for error
+ERROR_INIT = False            # set an init value for error
 USE_TREE = True               # use tree for memory
-MAX_ALT_RPT_ACT = 20          # max number of allowed repeated alt action
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -69,6 +67,7 @@ class Agent():
         self.p_replay_alpha = P_REPLAY_ALPHA
         self.p_replay_beta = P_REPLAY_BETA
         self.reward_scale = REWARD_SCALE
+        self.use_duel = USE_DUEL
         self.error_clip = ERROR_CLIP
 
         # Q-Network
@@ -88,9 +87,6 @@ class Agent():
         self.t_step = 0
         # keep track on whether training has started
         self.isTraining = False
-        # keep track of actions history
-        self.actHist = deque(maxlen=MAX_ALT_RPT_ACT)
-
         self.print_params()
 
     def print_params(self):
@@ -110,7 +106,7 @@ class Agent():
     def get_TD_values(self, local_net, target_net, s, a, r, ns, d, isLearning=False):
 
         ###### TD TARGET #######
-        s, ns, a = s.float().to(device), ns.float().to(device), a.to(device)
+        s, ns = s.float().to(device), ns.float().to(device) #to satisfy the network requirement
         with torch.no_grad(): #for sure no grad for this part
 
             ns_target_vals = target_net(ns)
@@ -146,13 +142,13 @@ class Agent():
             local_net.train()
             td_currents_vals = local_net(s)
 
-            td_currents = torch.gather(td_currents_vals, 1, a)
+            td_currents = torch.gather(td_currents_vals, 1, a.to(device))
         else:
             local_net.eval()
             with torch.no_grad():
                 td_currents_vals = local_net(s)
 
-                td_currents = torch.gather(td_currents_vals, 1, a)
+                td_currents = torch.gather(td_currents_vals, 1, a.to(device))
 
         local_net.train() #resume training for local network
 
@@ -184,15 +180,12 @@ class Agent():
         # Save experience in replay memory
         self.memory.add(state, action, reward, next_state, done, td_error)
 
-        # keep track of action record
-        self.actHist.append(action)
-
         # Learn every UPDATE_EVERY time steps.
         self.t_step += 1
 
         # gradually increase beta to 1 until end of epoche
         if self.isTraining:
-            self.p_replay_beta = min(1.0, self.p_replay_beta + P_BETA_DELTA)
+            self.p_replay_beta = min(1.0, self.p_replay_beta + 0.001)
             #self.p_replay_beta = P_REPLAY_BETA+((1-P_REPLAY_BETA)/ep_prgs[1])*ep_prgs[0]
 
         # If enough samples are available in memory, get random subset and learn
@@ -230,16 +223,8 @@ class Agent():
             action_values = self.qnetwork_local(state)
         self.qnetwork_local.train()
 
-        # check repeated alt action
-        odd_acts = [self.actHist[i] for i in range(len(self.actHist)) if i%2==1]
-        even_acts = [self.actHist[i] for i in range(len(self.actHist)) if i%2==0]
-        if np.std(odd_acts) == 0 and np.std(even_acts) == 0: #same even same odd
-            repeated_acts = True
-        else:
-            repeated_acts = False
-
         # Epsilon-greedy action selection
-        if random.random() > eps and repeated_acts == False:
+        if random.random() > eps:
             action =  np.argmax(action_values.cpu().data.numpy())
         else:
             action = random.choice(np.arange(self.action_size))

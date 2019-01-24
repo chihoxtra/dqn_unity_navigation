@@ -18,10 +18,10 @@ According to [Unity Github](https://github.com/Unity-Technologies/ml-agents/issu
 - Vector - 37 values<br>
   - Values 1-36 - ray values<br>
   - Value 37 - agent linear velocity<br>
-Ray Values<br>
-- 6 vectors of length 6<br>
-  - Values 1-5 - (1 or 0) - ray segments in increasing distance from the agent presence of a banana<br>
-  - Value 6 - Angular rotation of the ray from it starting point
+  - Ray Values
+    - 6 vectors of length 6
+      - Values 1-5 - (1 or 0) - ray segments in increasing distance from the agent presence of a banana
+      - Value 6 - Angular rotation of the ray from it starting point
 
 Given this information, the agent has to learn how to best select actions. Four discrete actions are available, corresponding to:<br>
 * 0 - move forward.<br>
