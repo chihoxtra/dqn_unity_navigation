@@ -15,19 +15,19 @@ A reward of +1 is provided for collecting a yellow banana, and a reward of -1 is
 <P>
 The state space has 37 dimensions and contains the agent's velocity, along with ray-based perception of objects around the agent's forward direction. <P>
 According to [Unity Github](https://github.com/Unity-Technologies/ml-agents/issues/1134), states can be interpreted as follows:<br>
-- Vector - 37 values
-  - Values 1-36 - ray values
-  - Value 37 - agent linear velocity
+- Vector - 37 values<br>
+  - Values 1-36 - ray values<br>
+  - Value 37 - agent linear velocity<br>
 Ray Values<br>
-- 6 vectors of length 6
-  - Values 1-5 - (1 or 0) - ray segments in increasing distance from the agent presence of a banana
+- 6 vectors of length 6<br>
+  - Values 1-5 - (1 or 0) - ray segments in increasing distance from the agent presence of a banana<br>
   - Value 6 - Angular rotation of the ray from it starting point
 <P>
 Given this information, the agent has to learn how to best select actions. Four discrete actions are available, corresponding to:<br>
-* 0 - move forward.
-* 1 - move backward.
-* 2 - turn left.
-* 3 - turn right.
+* 0 - move forward.<br>
+* 1 - move backward.<br>
+* 2 - turn left.<br>
+* 3 - turn right.<br>
 The task is episodic, and in order to solve the environment, the agent must get an average score of +13 over 100 consecutive episodes.
 
 ### Packages Dependencies
