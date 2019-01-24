@@ -13,7 +13,7 @@ This project attempts to use a DQN as a function appropximator to enable an agen
 
 A reward of +1 is provided for collecting a yellow banana, and a reward of -1 is provided for collecting a blue banana. Thus, the goal of your agent is to collect as many yellow bananas as possible while avoiding blue bananas.
 <P>
-The state space has 37 dimensions and contains the agent's velocity, along with ray-based perception of objects around the agent's forward direction. <P>
+The state space has 37 dimensions and contains the agent's velocity, along with ray-based perception of objects around the agent's forward direction. <br><br>
 According to [Unity Github](https://github.com/Unity-Technologies/ml-agents/issues/1134), states can be interpreted as follows:<br>
 - Vector - 37 values<br>
   - Values 1-36 - ray values<br>
