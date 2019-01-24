@@ -94,5 +94,5 @@ then you can start the notebook on your local machine.
 jupyter notebook --ip=0.0.0.0 --no-browser
 ```
 To run the notebook, press shift-enter and it shall run the codes cell by cell.
-<P>
+<br><br>
 Any question? please feel free to contact me at: [samuelpun@gmail.com](mailto:samuelpun@gmail.com)
