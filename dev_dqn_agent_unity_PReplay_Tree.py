@@ -29,13 +29,13 @@ GAMMA = 0.99                  # discount factor
 TAU = 1e-3                    # for soft update of target parameters
 LR = 1e-4                     # learning rate #1e-3
 LR_DECAY = True               # decay learning rate?
-LR_DECAY_START = int(3.5e5)   # number of steps before lr decay starts
+LR_DECAY_START = int(4e5)   # number of steps before lr decay starts
 LR_DECAY_STEP = int(5e3)      # LR decay steps
-LR_DECAY_GAMMA = 0.999        # LR decay gamma
+LR_DECAY_GAMMA = 0.995        # LR decay gamma #0.999
 UPDATE_EVERY = 16             # how often to update the network #4
 TD_ERROR_EPS = 1e-3           # make sure TD error is not zero
-P_REPLAY_ALPHA = 0.6          # balance between prioritized and random sampling #0.7
-P_REPLAY_BETA = 0.4           # adjustment on weight update #0.5
+P_REPLAY_ALPHA = 0.5          # balance between prioritized and random sampling #0.7
+P_REPLAY_BETA = 0.5           # adjustment on weight update #0.5
 P_BETA_DELTA = 1.5e-6         # beta increment per sampling
 USE_DUEL = True               # use duel network? V and A?
 USE_DOUBLE = True             # use double network to select TD value?
@@ -231,12 +231,14 @@ class Agent():
         self.qnetwork_local.train()
 
         # check repeated alt action
-        odd_acts = [self.actHist[i] for i in range(len(self.actHist)) if i%2==1]
-        even_acts = [self.actHist[i] for i in range(len(self.actHist)) if i%2==0]
-        if np.std(odd_acts) == 0 and np.std(even_acts) == 0: #same even same odd
-            repeated_acts = True
-        else:
-            repeated_acts = False
+        repeated_acts = False
+        if len(self.actHist) == MAX_ALT_RPT_ACT:
+            #check if all the even/odd slots are the same
+            odd_acts = [self.actHist[i] for i in range(len(self.actHist)) if i%2==1]
+            even_acts = [self.actHist[i] for i in range(len(self.actHist)) if i%2==0]
+
+            if np.std(odd_acts) == 0 and np.std(even_acts) == 0:
+                repeated_acts = True
 
         # Epsilon-greedy action selection
         if random.random() > eps and repeated_acts == False:
@@ -515,7 +517,7 @@ class ReplayBuffer:
             sampling_p = td_score / self.tree.total_td_score
 
             #  IS = (1/N * 1/P(i))**b /max wi == (N*P(i))**-b  /max wi
-            weight[i, 0] = np.power(self.batch_size * sampling_p, -p_replay_beta)/ max_weight
+            weight[i, 0] = np.power(self.buffer_size * sampling_p, -p_replay_beta)/ max_weight
 
             sample_ind[i]= leaf_index
 

@@ -22,9 +22,9 @@ This version is relatively more stable:
 - added treeSum
 """
 
-BUFFER_SIZE = int(1e5)        # replay buffer size #int(1e6)
+BUFFER_SIZE = int(1e3)        # replay buffer size #int(1e6)
 BATCH_SIZE = 64               # minibatch size ＃128
-REPLAY_MIN_SIZE = int(1e5)    # min len of memory before replay start int(1e5)
+REPLAY_MIN_SIZE = int(1e3)    # min len of memory before replay start int(1e5)
 GAMMA = 0.99                  # discount factor
 TAU = 1e-3                    # for soft update of target parameters
 LR = 1e-4                     # learning rate #1e-3
@@ -192,7 +192,7 @@ class Agent():
 
         # gradually increase beta to 1 until end of epoche
         if self.isTraining:
-            self.p_replay_beta = min(1.0, self.p_replay_beta + 0.001)
+            self.p_replay_beta = min(1.0, self.p_replay_beta + P_BETA_DELTA)
             #self.p_replay_beta = P_REPLAY_BETA+((1-P_REPLAY_BETA)/ep_prgs[1])*ep_prgs[0]
 
         # If enough samples are available in memory, get random subset and learn
